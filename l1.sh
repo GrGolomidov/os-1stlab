@@ -35,14 +35,18 @@ case "$check" in
 	sudo ip link set $i down
     done;;
 "-s")
-    #sudo ip addr add $2/$3 dev $4
-    sudo ifconfig $4 $2 netmask $3 up
+    sudo ip addr add $2/$3 dev $4
+    #sudo ifconfig $4 $2 netmask $3 up
     sudo ip route add default via $5;;
 "-n")
-    netstat -r
+    netstat -rn
     netstat -i
-    netstat -s
-#"-f")
-    #grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" file.txt
-    #printf $ip
+    netstat -s;;
+"-f")
+    z="1[0-9][0-9].1[0-9][0-9].[0-9].[0-9]"
+    d=$(ip r | grep $z | sed '1d' | awk '{print $3}')
+    sudo ifdown $d;;
+#"-p")
+#    d=$(ip r | grep $2 | sed '1d' | awk '{print $3}')
+#    sudo ifdown $d;;
 esac
