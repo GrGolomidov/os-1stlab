@@ -24,8 +24,7 @@ case "$check" in
 	printf "$i\t\t$(ifconfig $i | grep "ether" | awk '{print $2}')\t\t$(ifconfig $i | grep "inet " | awk '{print $2}')\t\t$(ifconfig $i | grep "RX packets" | awk '{print $6, $7}')\n"
     done;;
 "-o")
-    q=$#
-    for (( i=2, j=3; i <= q; i+=2, j+=2 ))
+    for (( i=2, j=3; i <= $#; i+=2, j+=2 ))
     do
 	sudo ip link set ${!j} ${!i}
 	#sudo "if${!i}" ${!j}
@@ -39,6 +38,10 @@ case "$check" in
     #sudo ip addr add $2/$3 dev $4
     sudo ifconfig $4 $2 netmask $3 up
     sudo ip route add default via $5;;
+"-n")
+    netstat -r
+    netstat -i
+    netstat -s
 #"-f")
     #grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" file.txt
     #printf $ip
