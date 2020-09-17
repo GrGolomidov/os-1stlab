@@ -2,12 +2,13 @@
 
 check=$1
 
-if [[ $(id -u) != 0 ]]; then
+if [[ "$EUID" -ne 0 ]]; then
+    echo sudo ./l1.sh
     exit 1
 fi
 
 if [[ $check = '' ]]; then
-    l1.sh -h
+    $0 -h
 fi
 
 case "$check" in
@@ -24,7 +25,7 @@ case "$check" in
 Примеры запуска:\n\tl1.sh -o down <int_name1> up <int_name2>\n\tl1.sh -k <port>\n
 \tl1.sh -s <ip> <mask> <int_name> <gw>\n\tl1.sh -f <ip>\n";;
 "-k")
-    kill -9 $(lsof -t -i:$2);;
+    kill -9 $(lsof -t -i4:$2);;
 "-i")
     printf "Имя сетевого инт.\tMAC адрес\t\tIP адрес\t\tСкорость соединения\n"
     for i in $(ls /sys/class/net/)
