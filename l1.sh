@@ -2,6 +2,14 @@
 
 check=$1
 
+if [[ $(id -u) != 0 ]]; then
+    exit 1
+fi
+
+if [[ $check = '' ]]; then
+    l1.sh -h
+fi
+
 case "$check" in
 "-h"|"--help")
     printf "Авторы:\n\tАлександр Шихалев\n\tАлина Насонова\n\tГригорий Голомидов\n
@@ -14,9 +22,9 @@ case "$check" in
 Кратное описание проекта:
 \tПроект позволяет управлять сетевыми настройками системы с помощью аргументов.
 Примеры запуска:\n\tl1.sh -o down <int_name1> up <int_name2>\n\tl1.sh -k <port>\n
-\tl1.sh -s <ip> <mask> <int_name> <gw>\n";;
+\tl1.sh -s <ip> <mask> <int_name> <gw>\n\tl1.sh -f <ip>\n";;
 "-k")
-    kill -9 $2;;
+    kill -9 $(lsof -t -i:$2);;
 "-i")
     printf "Имя сетевого инт.\tMAC адрес\t\tIP адрес\t\tСкорость соединения\n"
     for i in $(ls /sys/class/net/)
@@ -26,27 +34,26 @@ case "$check" in
 "-o")
     for (( i=2, j=3; i <= $#; i+=2, j+=2 ))
     do
-	sudo ip link set ${!j} ${!i}
-	#sudo "if${!i}" ${!j}
+	ip link set ${!j} ${!i}
+	#"if${!i}" ${!j}
     done;;
 "-a")
     for i in $(ls /sys/class/net/)
     do
-	sudo ip link set $i down
+	ip link set $i down
     done;;
 "-s")
-    sudo ip addr add $2/$3 dev $4
-    #sudo ifconfig $4 $2 netmask $3 up
-    sudo ip route add default via $5;;
+    ip addr add $2/$3 dev $4
+    #ifconfig $4 $2 netmask $3 up
+    ip route add default via $5;;
 "-n")
-    netstat -rn
-    netstat -i
-    netstat -s;;
-"-f")
-    z="1[0-9][0-9].1[0-9][0-9].[0-9].[0-9]"
-    d=$(ip r | grep $z | sed '1d' | awk '{print $3}')
-    sudo ifdown $d;;
-#"-p")
-#    d=$(ip r | grep $2 | sed '1d' | awk '{print $3}')
+    netstat -plntu --inet | sort -t: -k2,2n | sort --stable -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | sort -s -t" " -k1,1;;
+#"-f")
+#    z="1[0-9][0-9].1[0-9][0-9].[0-9].[0-9]"
+#    d=$(ip r | grep $z | sed '1d' | awk '{print $3}')
 #    sudo ifdown $d;;
+"-f")
+    d=$(ip a | grep $2 | awk '{print $9}')
+    #d=$(ip r | grep $2 | sed '1d' | awk '{print $3}')
+    ip link set $d down;;
 esac
