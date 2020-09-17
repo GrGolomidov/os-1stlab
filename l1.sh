@@ -48,7 +48,7 @@ case "$check" in
     #ifconfig $4 $2 netmask $3 up
     ip route add default via $5;;
 "-n")
-    netstat -plntu --inet | sort -t: -k2,2n | sort --stable -t. -k 1,1n -k 2,2n -k 3,3n -k 4,4n | sort -s -t" " -k1,1;;
+    cat /proc/net/dev;;
 #"-f")
 #    z="1[0-9][0-9].1[0-9][0-9].[0-9].[0-9]"
 #    d=$(ip r | grep $z | sed '1d' | awk '{print $3}')
